@@ -113,8 +113,10 @@ public class BarRenderer {
                 GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
                 GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
                 GlStateManager.scale(-scale, -scale, scale);
-//                boolean lighting = GL11.glGetBoolean(GL11.GL_LIGHTING); lighting is always `false` here when I tested and it takes up a surprising amount of time in Spark ~roz
-//                GlStateManager.disableLighting();
+                boolean prevLighting = GlStateManager.lightingState.currentState;
+                if (prevLighting) {
+                    GlStateManager.disableLighting();
+                }
                 GlStateManager.depthMask(false);
                 GlStateManager.disableDepth();
                 GlStateManager.disableTexture2D();
@@ -294,9 +296,9 @@ public class BarRenderer {
                 GlStateManager.disableBlend();
                 GlStateManager.enableDepth();
                 GlStateManager.depthMask(true);
-//                if (lighting) {
-//                    GlStateManager.enableLighting();
-//                }
+                if (prevLighting) {
+                    GlStateManager.enableLighting();
+                }
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 GlStateManager.popMatrix();
 
