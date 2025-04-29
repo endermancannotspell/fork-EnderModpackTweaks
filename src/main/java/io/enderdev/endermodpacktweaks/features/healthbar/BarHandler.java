@@ -45,6 +45,10 @@ public class BarHandler {
 
     private final Frustum frustum = new Frustum();
 
+    // focused entity linger
+    private long lingerUntil = 0L;
+    private EntityLivingBase lingerEntity;
+
     @SubscribeEvent
     public void onRenderWorldLast(RenderWorldLastEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
@@ -74,6 +78,16 @@ public class BarHandler {
             Entity focused = BarRenderer.getEntityLookedAt(mc.player);
             if (focused instanceof EntityLivingBase && focused.isEntityAlive()) {
                 renderHealthBar((EntityLivingBase) focused, partialTicks, cameraEntity);
+                if(CfgFeatures.MOB_HEALTH_BAR.focusedLinger != 0) {
+                    lingerUntil = Minecraft.getSystemTime() + CfgFeatures.MOB_HEALTH_BAR.focusedLinger;
+                    lingerEntity = (EntityLivingBase) focused;
+                }
+            } else if(lingerUntil != 0L) {
+                if (Minecraft.getSystemTime() < lingerUntil) {
+                    renderHealthBar(lingerEntity, partialTicks, cameraEntity);
+                } else {
+                    lingerUntil = 0L;
+                }
             }
         } else {
             for (Entity entity : ((WorldClientAccessor) mc.world).getEntityList()) {
